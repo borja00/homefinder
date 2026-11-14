@@ -1,0 +1,29 @@
+# Copy to config.yaml and edit. config.yaml is git-ignored.
+# In the cluster this file is the homefinder-config ConfigMap (apps/homefinder in infra).
+
+# Searches to monitor. Build the search on idealista.com with your filters
+# (area, price, size, rooms, features...), sort by "most recent", then paste
+# the resulting URL here.
+searches:
+  - name: example-madrid-chamberi
+    url: https://www.idealista.com/venta-viviendas/madrid/chamberi/con-precio-hasta_450000,de-dos-dormitorios/?ordenado-por=fecha-publicacion-desc
+
+scraper:
+  # Max result pages to load per search per run (~30 listings per page).
+  max_pages_per_search: 3
+  # Random pause before every request, in seconds. Keep this slow.
+  delay_seconds: [25, 60]
+  # Keep raw HTML (gzipped, in Postgres) so listings can be re-parsed if
+  # Idealista changes its markup. About 2.5 MB per day for 60 pages.
+  save_raw_html: true
+  raw_html_retention_days: 30
+  # Load each new listing's own page (full description, photos, all features)
+  # after the search pages, newest first, at most this many per run; the rest
+  # wait for the next run. Same pause before each as for search pages.
+  fetch_details: true
+  details_per_run: 100
+  # A scrape cut short (server stopped, pod restarted, Job killed) is resumed
+  # by the running server from the page it reached, the same day, at most
+  # this many times in a row.
+  auto_resume: true
+  resume_attempts: 3
